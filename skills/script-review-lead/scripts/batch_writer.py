@@ -12,8 +12,12 @@ from pathlib import Path
 
 if sys.platform.startswith("win"):
     try:
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        else:
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
     except Exception:
         pass
 
@@ -86,7 +90,7 @@ def write_batch(
                 snapshot_file = snapshots_dir / f"global_ledgers_ep_{milestone:03d}.md"
                 if not snapshot_file.exists():
                     shutil.copy2(global_ledger_file, snapshot_file)
-                    print(f"📸 [快照备份] 跨越第 {milestone} 集里程碑，台账快照已自动归档: {snapshot_file}")
+                    print(f"📸 [快照备份] 跨越第 {milestone} 集里程碑 (当前批次推进至第 {end_ep} 集)，台账快照已自动归档: {snapshot_file}")
 
 
 def main():

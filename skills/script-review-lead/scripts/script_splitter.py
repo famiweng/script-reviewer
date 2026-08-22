@@ -14,8 +14,12 @@ from typing import List, Dict
 
 if sys.platform.startswith("win"):
     try:
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        else:
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
     except Exception:
         pass
 
@@ -202,7 +206,9 @@ def main():
         sys.exit(1)
 
     workspace_path = Path(args.output)
-    project_name = input_path.stem
+    # 清洗项目名称，过滤文件系统非法字符并去除首尾冗余空格
+    clean_stem = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '_', input_path.stem).strip()
+    project_name = clean_stem or "unnamed_project"
     # 自动命名空间隔离：如果输出路径为默认根目录且未包含项目名，则自动按剧本名创建独立子工作区
     if workspace_path.name == ".script_review_workspace":
         workspace_path = workspace_path / project_name
