@@ -1,15 +1,8 @@
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Logs and databases
-*.log
-*.sqlite
-
-# Python bytecode
 __pycache__/
 *.py[cod]
-
-# IDE
-.idea/
-.vscode/
+*$py.class
+.script_review_workspace/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
